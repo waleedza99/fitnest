@@ -1,0 +1,1 @@
+{"statusCode":201,"body":"{\"message\":\"Workout created\",\"workout\":{\"userId\":\"TEMP_USER_ID\",\"workoutId\":\"23ba987a-edbc-4fc1-8c60-3853ffb859c6\",\"date\":\"2026-04-25\",\"exercise\":\"Bench Press\",\"sets\":3,\"reps\":8,\"weight\":185,\"createdAt\":\"2026-04-25T20:20:39.465Z\"}}"}

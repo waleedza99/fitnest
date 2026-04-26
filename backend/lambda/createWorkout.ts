@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { randomUUID } from 'crypto';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { randomUUID } from "crypto";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 const dynamoClient = new DynamoDBClient({});
 const documentClient = DynamoDBDocumentClient.from(dynamoClient);
@@ -9,12 +9,12 @@ const documentClient = DynamoDBDocumentClient.from(dynamoClient);
 const tableName = process.env.WORKOUTS_TABLE_NAME;
 
 export const handler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log('Create workout Lambda invoked');
+  console.log("Create workout Lambda invoked");
 
   if (!tableName) {
-    throw new Error('WORKOUTS_TABLE_NAME is not configured');
+    throw new Error("WORKOUTS_TABLE_NAME is not configured");
   }
 
   const body = event.body ? JSON.parse(event.body) : {};
@@ -23,7 +23,7 @@ export const handler = async (
   const createdAt = new Date().toISOString();
 
   const item = {
-    userId: 'TEMP_USER_ID',
+    userId: "TEMP_USER_ID",
     workoutId,
     date: body.date,
     exercise: body.exercise,
@@ -37,13 +37,13 @@ export const handler = async (
     new PutCommand({
       TableName: tableName,
       Item: item,
-    })
+    }),
   );
 
   return {
     statusCode: 201,
     body: JSON.stringify({
-      message: 'Workout created',
+      message: "Workout created",
       workout: item,
     }),
   };
