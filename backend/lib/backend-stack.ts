@@ -21,7 +21,7 @@ export class BackendStack extends cdk.Stack {
       this,
       "CreateWorkoutLambda",
       {
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         entry: path.join(__dirname, "../lambda/createWorkout.ts"),
         handler: "handler",
         environment: {
@@ -32,6 +32,17 @@ export class BackendStack extends cdk.Stack {
 
     workoutsTable.grantWriteData(createWorkoutLambda);
 
+    const getWorkoutsLambda = new NodejsFunction(this, "GetWorkoutsLambda", {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      entry: path.join(__dirname, "../lambda/getWorkouts.ts"),
+      handler: "handler",
+      environment: {
+        WORKOUTS_TABLE_NAME: workoutsTable.tableName,
+      },
+    });
+
+    workoutsTable.grantReadData(getWorkoutsLambda);
+
     const api = new apigateway.RestApi(this, "FitnestApi", {
       restApiName: "Fitnest API",
     });
@@ -41,6 +52,10 @@ export class BackendStack extends cdk.Stack {
     workouts.addMethod(
       "POST",
       new apigateway.LambdaIntegration(createWorkoutLambda),
+    );
+    workouts.addMethod(
+      "GET",
+      new apigateway.LambdaIntegration(getWorkoutsLambda),
     );
   }
 }
