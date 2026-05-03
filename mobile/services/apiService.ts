@@ -12,6 +12,14 @@ export type Workout = {
   createdAt: string;
 };
 
+export type CreateWorkoutInput = {
+  date: string;
+  exercise: string;
+  sets: number;
+  reps: number;
+  weight: number;
+};
+
 export const getWorkouts = async (): Promise<Workout[]> => {
   const response = await fetch(`${API_BASE_URL}/workouts`);
 
@@ -22,4 +30,24 @@ export const getWorkouts = async (): Promise<Workout[]> => {
   const data = await response.json();
 
   return data.workouts ?? [];
+};
+
+export const createWorkout = async (
+  workout: CreateWorkoutInput,
+): Promise<Workout> => {
+  const response = await fetch(`${API_BASE_URL}/workouts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(workout),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create workout");
+  }
+
+  const data = await response.json();
+
+  return data.workout;
 };

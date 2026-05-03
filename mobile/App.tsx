@@ -6,14 +6,21 @@ import {
   StyleSheet,
   Text,
   View,
+  TextInput,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { getWorkouts, Workout } from "./services/apiService";
+import { createWorkout, getWorkouts, Workout } from "./services/apiService";
 
 export default function App() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exercise, setExercise] = useState("");
+  const [sets, setSets] = useState("");
+  const [reps, setReps] = useState("");
+  const [weight, setWeight] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadWorkouts();
@@ -32,6 +39,31 @@ export default function App() {
     }
   };
 
+  const handleCreateWorkout = async () => {
+    try {
+      setSaving(true);
+
+      await createWorkout({
+        date: new Date().toISOString().slice(0, 10),
+        exercise,
+        sets: Number(sets),
+        reps: Number(reps),
+        weight: Number(weight),
+      });
+
+      setExercise("");
+      setSets("");
+      setReps("");
+      setWeight("");
+
+      await loadWorkouts();
+    } catch (err) {
+      setError("Could not create workout");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -40,6 +72,49 @@ export default function App() {
         <View style={styles.header}>
           <Text style={styles.title}>Fitnest</Text>
           <Text style={styles.subtitle}>Workout history from AWS</Text>
+        </View>
+
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Exercise"
+            value={exercise}
+            onChangeText={setExercise}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Sets"
+            value={sets}
+            onChangeText={setSets}
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Reps"
+            value={reps}
+            onChangeText={setReps}
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Weight"
+            value={weight}
+            onChangeText={setWeight}
+            keyboardType="numeric"
+          />
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleCreateWorkout}
+            disabled={saving}
+          >
+            <Text style={styles.buttonText}>
+              {saving ? "Saving..." : "Add Workout"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {loading && <ActivityIndicator size="large" />}
@@ -110,5 +185,27 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     fontSize: 16,
+  },
+  form: {
+    marginBottom: 24,
+    gap: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#111",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
